@@ -1,0 +1,123 @@
+version: "3.9"
+
+services:
+  # Pipelines
+  etl_pipeline:
+    build:
+      context: ./etl_pipeline
+    container_name: etl_pipeline
+    image: etl_pipeline:latest
+    volumes:
+      - ./etl_pipeline:/opt/dagster/app
+    env_file:
+      - env
+    networks:
+      - de_network
+
+  de_mysql:
+    hostname: de_mysql
+    image: mysql:8.0
+    container_name: de_mysql
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin123
+      - MYSQL_DATABASE=dunnhumby
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - de_network
+
+  de_psql:
+    hostname: de_psql
+    container_name: de_psql
+    image: postgres:15
+    environment:
+      - POSTGRES_HOST=de_psql
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ./postgresdb:/var/lib/postgresql/data
+      #- ./db/init.sql:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    restart: unless-stopped
+    networks:
+      - de_network
+
+  minio:
+    hostname: minio
+    image: "minio/minio"
+    container_name: minio
+    ports:
+      - "9001:9001"
+      - "9000:9000"
+    command: [ "server", "/data", "--console-address", ":9001" ]
+    volumes:
+      - ./minio:/data
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=minio123
+    networks:
+      - de_network
+
+  # Dagster
+  de_dagster:
+    build:
+      context: ./dagster/
+    container_name: de_dagster
+    image: de_dagster
+
+  de_dagster_dagit:
+    image: de_dagster:latest
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3001"
+      - -w
+      - workspace.yaml
+    container_name: de_dagster_dagit
+    expose:
+      - "3001"
+    ports:
+      - "3001:3001"
+    volumes: # Make docker client accessible so we can terminate containers from dagit
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dagster_home:/opt/dagster/dagster_home
+    env_file:
+      - env
+    networks:
+      - de_network
+
+  de_dagster_daemon:
+    image: de_dagster:latest
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: de_dagster_daemon
+    volumes: # Make docker client accessible so we can launch containers using host docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dagster_home:/opt/dagster/dagster_home
+    env_file:
+      - env
+    networks:
+      - de_network
+
+volumes:
+  mysql_data:
+  db:
+    driver: local
+
+networks:
+  de_network:
+    driver: bridge
+    name: my_network
