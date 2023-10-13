@@ -1,4 +1,6 @@
-Dataset: https://www.kaggle.com/datasets/frtgnn/dunnhumby-the-complete-journey
+# Dataset: https://www.kaggle.com/datasets/frtgnn/dunnhumby-the-complete-journey
+
+![alt text](https://github.com/huynhdoanho/dagster_etl_dunnhumby/blob/81132c78cf80d03e35ba92f92df43098f439458b/img/data.png)
 
 # Overview:
 
@@ -24,6 +26,8 @@ docker compose up -d
 ```
 
 Check  <b> localhost:3001 </b>, our Dagster Asset Lineage will be like this:
+
+![alt text](https://github.com/huynhdoanho/dagster_etl_dunnhumby/blob/81132c78cf80d03e35ba92f92df43098f439458b/img/dags.png)
 
 - <b>Note: Before materializing, make sure that you have imported the Brazillian Ecommerce dataset (I have attached the link above) to data source (MySQL). You can connect to MySQL through port 3307, user: admin, password: admin123, database: brazillian-ecommerce
 </b>
