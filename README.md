@@ -23,9 +23,12 @@ docker compose build
 docker compose up -d
 ```
 
-Check  <b> localhost:3001 </b>
+Check  <b> localhost:3001 </b>, our Dagster Asset Lineage will be like this:
 
-Click materialize button to run Dagster dags
+- <b>Note: Before materializing, make sure that you have imported the Brazillian Ecommerce dataset (I have attached the link above) to data source (MySQL). You can connect to MySQL through port 3307, user: admin, password: admin123, database: brazillian-ecommerce
+</b>
+
+Click materialize button to run
 
 Check PostgreSQL at:
 - Port: 5434
