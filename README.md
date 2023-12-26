@@ -1,3 +1,6 @@
+# Description: 
+Extract data of a retail store from MySQL database, transform with pandas then load it into data warehouse (PostgreSQL). Build a classification model to predict which customers will be interested in coupon redemption, helping marketing team to run campaigns more efficiently.
+
 # Dataset: 
 <url>https://www.kaggle.com/datasets/frtgnn/dunnhumby-the-complete-journey</url>
 
